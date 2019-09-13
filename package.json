@@ -1,0 +1,30 @@
+{
+    "name": "parse-ini-file",
+    "description": "ini file parser",
+    "version": "0.0.0",
+    "license": "MIT",
+    "private": true,
+    "main": "./index.js",
+    "author": "Taitu Lizenbaum <taitu.dev@gmail@gmail.com>",
+    "scripts": {
+        "play": "node ./playground/play.js",
+        "lint": "eslint ./index.js ./src ./tests",
+        "test": "mocha ./tests",
+        "dev": "mocha ./tests --watch",
+        "preversion": "npm run lint && npm test",
+        "postversion": "git push && git push --tags"
+    },
+    "devDependencies": {
+        "eslint": "*",
+        "mocha": "*",
+        "chai": "*",
+        "sinon": "*",
+        "chai-as-promised": "*"
+    },
+    "keywords": [
+        "ini",
+        "config.ini",
+        "parser",
+        "parse"
+    ]
+}
