@@ -1,6 +1,6 @@
 {
     "name": "parse-ini-file",
-    "description": "ini file parser",
+    "description": "Parse `.ini` files into JSON objects",
     "version": "0.0.0",
     "license": "MIT",
     "private": true,

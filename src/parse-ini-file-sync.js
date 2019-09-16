@@ -1,19 +1,20 @@
 const fs = require('fs');
-const {EOL} = require('os');
 
 const getLineHandler = require('./get-line-handler');
-const {createConfigs, finalizeConfigs} = require('./utilities');
 
 function parseIniFileSync (path) {
-	const content = fs.readFileSync(path, 'utf-8');
+	if (typeof path !== 'string') {
+		throw new Error('parseIniFile: First argument "path" must be a string.');
+	}
 
-	const lines = content.split(EOL);
-	const cfg = createConfigs();
-	const lineHandler = getLineHandler(cfg);
+	const rootObj = {};
+	const lineHandler = getLineHandler(rootObj);
+	const content = fs.readFileSync(path, 'utf-8');
+	const lines = content.split(/\r?\n/u);
 
 	lines.forEach(lineHandler);
 
-	return finalizeConfigs(cfg);
+	return rootObj;
 }
 
 module.exports = parseIniFileSync;
