@@ -1,17 +1,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-parse-ini-file
-==============
+SHMAML
+======
 Parse `.ini` files into JSON objects.
 
 ## Install
 ```sh
-$ npm install parse-ini-file
+$ npm install shmaml
 ```
 
 ## Use
 ```js
-const parse = require('ini-file-parser');
+const parse = require('shmaml');
 
 const resultPromise = parse('../path/to/config.ini');
 // or:

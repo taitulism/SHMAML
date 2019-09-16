@@ -2,9 +2,9 @@ const fs = require('fs');
 
 const getLineHandler = require('./get-line-handler');
 
-function parseIniFileSync (path) {
+function parseSync (path) {
 	if (typeof path !== 'string') {
-		throw new Error('parseIniFile: First argument "path" must be a string.');
+		throw new Error('SHMAML: First argument "path" must be a string.');
 	}
 
 	const rootObj = {};
@@ -17,4 +17,4 @@ function parseIniFileSync (path) {
 	return rootObj;
 }
 
-module.exports = parseIniFileSync;
+module.exports = parseSync;

@@ -1,5 +1,5 @@
 {
-    "name": "parse-ini-file",
+    "name": "shmaml",
     "description": "Parse `.ini` files into JSON objects",
     "version": "0.0.0",
     "license": "MIT",
@@ -7,19 +7,19 @@
     "main": "./index.js",
     "author": "Taitu Lizenbaum <taitu.dev@gmail@gmail.com>",
     "scripts": {
-        "play": "node ./playground/play.js",
-        "lint": "eslint ./index.js ./src ./tests",
-        "test": "mocha ./tests",
         "dev": "mocha ./tests --watch",
-        "preversion": "npm run lint && npm test",
+        "test": "mocha ./tests",
+        "lint": "eslint ./index.js ./src ./tests",
+        "check": "npm run lint && npm test",
+        "play": "node ./playground/play.js",
+        "preversion": "npm run check",
         "postversion": "git push && git push --tags"
     },
     "devDependencies": {
-        "eslint": "*",
-        "mocha": "*",
-        "chai": "*",
-        "sinon": "*",
-        "chai-as-promised": "*"
+        "eslint": "6.4.0",
+        "mocha": "6.2.0",
+        "chai": "4.2.0",
+        "chai-as-promised": "7.1.1"
     },
     "keywords": [
         "ini",

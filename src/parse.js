@@ -3,10 +3,10 @@ const readline = require('readline');
 
 const getLineHandler = require('./get-line-handler');
 
-function parseIniFile (path) {
+function parse (path) {
 	return new Promise((resolve, reject) => {
 		if (typeof path !== 'string') {
-			return reject(new Error('parseIniFile: First argument "path" must be a string.'));
+			return reject(new Error('SHMAML: First argument "path" must be a string.'));
 		}
 
 		const rootObj = {};
@@ -24,7 +24,7 @@ function parseIniFile (path) {
 	});
 }
 
-module.exports = parseIniFile;
+module.exports = parse;
 
 function createFileLineReader (path) {
 	const fileStream = fs.createReadStream(path);

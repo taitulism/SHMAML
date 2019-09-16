@@ -1,6 +1,6 @@
-const parseIniFile = require('./src/parse-ini-file');
-const parseIniFileSync = require('./src/parse-ini-file-sync');
+const parse = require('./src/parse');
+const parseSync = require('./src/parse-sync');
 
-parseIniFile.sync = parseIniFileSync;
+parse.sync = parseSync;
 
-module.exports = parseIniFile;
+module.exports = parse;

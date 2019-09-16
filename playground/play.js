@@ -1,25 +1,17 @@
-const fs = require('fs');
-const readline = require('readline');
+/* eslint-disable */
 
-const {parseIniFile} = require('../index');
+// const fs = require('fs');
+
+const parse = require('../index');
 
 (async () => {
 	try {
-		const rs = fs.createReadStream('qwedasd')
+		const obj = await parse('./playground/dummy.ini');
 
-		rs.on('error', (er) => {
-			console.log('errrrrrrrr', er);
-		})
-
-		console.log(rs);
+		console.log(obj);
 	}
 	catch (err) {
-		console.log('cought', err);
+		console.log('ARRR:\n', err);
 	}
 
-	setTimeout(() => {
-		console.log(234);
-	}, 5000);
-	// const qwe = await parseIniFile('../dsffd.ini')
-	// console.log(qwe);
 })();
