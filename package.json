@@ -5,7 +5,12 @@
     "license": "MIT",
     "private": true,
     "main": "./index.js",
-    "author": "Taitu Lizenbaum <taitu.dev@gmail@gmail.com>",
+	"author": "Taitu Lizenbaum <taitu.dev@gmail.com>",
+	"homepage": "https://github.com/taitulism/SHMAML#readme",
+	"repository": {
+		"type" : "git",
+		"url" : "https://github.com/taitulism/SHMAML.git"
+	},
     "scripts": {
         "dev": "mocha ./tests --watch",
         "test": "mocha ./tests",
