@@ -58,8 +58,8 @@ describe('SHMAML\n  ──────', () => {
 				it('ignored', async () => {
 					const returnedValue = await parse('./tests/ini-files/comments.ini');
 
+					expect(returnedValue).to.haveOwnProperty('a');
 					expect(returnedValue).to.not.haveOwnProperty('comment');
-					expect(returnedValue).to.not.haveOwnProperty('flags');
 				});
 			});
 
@@ -97,33 +97,11 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
-			describe('{ flags: [...] }', () => {
-				it('handle non-key-value pairs (when no equal sign)', async () => {
-					const returnedValue = await parse('./tests/ini-files/flags.ini');
-
-					expect(returnedValue).to.deep.equal({
-						flags: [
-							'AAA',
-							'BBB',
-						],
-						section: {
-							key: 'value',
-							flags: ['SECTION_FLAG'],
-						},
-					});
-				});
-			});
-
-
 			it('parses standard ini files', async () => {
 				const returnedValue = await parse('./tests/ini-files/standard.ini');
 
 				expect(returnedValue).to.deep.equal({
 					rootKey: 'rootValue',
-					flags: [
-						'useFeatureA',
-						'useFeatureB',
-					],
 					SectionA: {
 						a: 5,
 						aa: '55',
@@ -131,7 +109,6 @@ describe('SHMAML\n  ──────', () => {
 						aaaa: ' 5555',
 					},
 					SectionB: {
-						flags: ['useFeatureB', true],
 						key: 'value',
 						boolTrue: true,
 						boolFalse: false,
@@ -189,8 +166,8 @@ describe('SHMAML\n  ──────', () => {
 				it('ignored', () => {
 					const returnedValue = parseSync('./tests/ini-files/comments.ini');
 
+					expect(returnedValue).to.haveOwnProperty('a');
 					expect(returnedValue).to.not.haveOwnProperty('comment');
-					expect(returnedValue).to.not.haveOwnProperty('flags');
 				});
 			});
 
@@ -228,33 +205,11 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
-			describe('{ flags: [...] }', () => {
-				it('handle non-key-value pairs (when no equal sign)', () => {
-					const returnedValue = parseSync('./tests/ini-files/flags.ini');
-
-					expect(returnedValue).to.deep.equal({
-						flags: [
-							'AAA',
-							'BBB',
-						],
-						section: {
-							key: 'value',
-							flags: ['SECTION_FLAG'],
-						},
-					});
-				});
-			});
-
-
 			it('parses standard ini files', () => {
 				const returnedValue = parseSync('./tests/ini-files/standard.ini');
 
 				expect(returnedValue).to.deep.equal({
 					rootKey: 'rootValue',
-					flags: [
-						'useFeatureA',
-						'useFeatureB',
-					],
 					SectionA: {
 						a: 5,
 						aa: '55',
@@ -262,7 +217,6 @@ describe('SHMAML\n  ──────', () => {
 						aaaa: ' 5555',
 					},
 					SectionB: {
-						flags: ['useFeatureB', true],
 						key: 'value',
 						boolTrue: true,
 						boolFalse: false,

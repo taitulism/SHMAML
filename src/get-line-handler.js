@@ -24,6 +24,7 @@ function getLineHandler (rootObj) {
 		// [section]
 		if (isSection(line)) {
 			const sectionName = getSectionName(line);
+
 			rootObj[sectionName] = rootObj[sectionName] || {};
 			currentObj = rootObj[sectionName];
 
@@ -32,36 +33,20 @@ function getLineHandler (rootObj) {
 
 		const firstEqual = line.indexOf('=');
 
-		// flags
-		if (firstEqual === NONE) {
-			currentObj.flags = currentObj.flags || [];
+		if (firstEqual === NONE) return;
 
-			line = removeInlineComments(line);
-
-			if (isQuoted(line)) {
-				line = extractFromWrapper(line);
-			}
-
-			if (!currentObj.flags.includes(line)) {
-				if (isBooleanStr(line)) {
-					const bool = getBoolean(line);
-					currentObj.flags.push(bool);
-				}
-				else {
-					currentObj.flags.push(line);
-				}
-			}
-
-			return;
-		}
-
-		// key=value pairs
-		// split once by equal
-		const key = line.substr(0, firstEqual).trim();
-		const value = line.substr(firstEqual + 1).trim();
+		const [key, value] = getKeyValue(line, firstEqual);
 
 		currentObj[key] = normalizeValue(value);
 	};
 }
 
 module.exports = getLineHandler;
+
+function getKeyValue (line, firstEqual) {
+	// split once by equal
+	const key = line.substr(0, firstEqual).trim();
+	const value = line.substr(firstEqual + 1).trim();
+
+	return [key, value];
+}
