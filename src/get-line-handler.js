@@ -16,6 +16,8 @@ const NONE = -1;
 
 function getLineHandler (rootObj) {
 	let currentObj = rootObj;
+	let currentList = null;
+
 	return (line) => {
 		line = line.trim();
 
@@ -35,9 +37,24 @@ function getLineHandler (rootObj) {
 
 		if (firstEqual === NONE) return;
 
-		const [key, value] = getKeyValue(line, firstEqual);
+		const [key, rawValue] = getKeyValue(line, firstEqual);
 
-		currentObj[key] = normalizeValue(value);
+		// List
+		if (rawValue.startsWith('[')) {
+			if (rawValue.endsWith(']')) { // single line list
+				const value = extractFromWrapper(rawValue);
+				const listItems = value.split(/,\s?/u).map(normalizeValue);
+
+				currentObj[key] = listItems;
+			}
+			else { // multiline list
+
+			}
+		}
+		// key=value
+		else {
+			currentObj[key] = normalizeValue(rawValue);
+		}
 	};
 }
 

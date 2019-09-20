@@ -97,6 +97,24 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
+			describe('{ list: [item, item, item] }', () => {
+				it('[section]', async () => {
+					const returnedValue = await parse('./tests/ini-files/list.ini');
+
+					expect(returnedValue).to.deep.equal({
+						colors: [
+							'blue',
+							'yellow'
+						],
+						key: 'value',
+						super_heros: {
+							names: ['Superman', 'Batman', 'Spiderman'],
+							key: 'value'
+						},
+					});
+				});
+			});
+
 			it('parses standard ini files', async () => {
 				const returnedValue = await parse('./tests/ini-files/standard.ini');
 
@@ -109,6 +127,7 @@ describe('SHMAML\n  ──────', () => {
 						aaaa: ' 5555',
 					},
 					SectionB: {
+						list: ['aaa', 'bbb', 'ccc'],
 						key: 'value',
 						boolTrue: true,
 						boolFalse: false,
@@ -205,6 +224,24 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
+			describe('{ list: [item, item, item] }', () => {
+				it('[section]', async () => {
+					const returnedValue = parseSync('./tests/ini-files/list.ini');
+
+					expect(returnedValue).to.deep.equal({
+						colors: [
+							'blue',
+							'yellow'
+						],
+						key: 'value',
+						super_heros: {
+							names: ['Superman', 'Batman', 'Spiderman'],
+							key: 'value'
+						},
+					});
+				});
+			});
+
 			it('parses standard ini files', () => {
 				const returnedValue = parseSync('./tests/ini-files/standard.ini');
 
@@ -217,6 +254,7 @@ describe('SHMAML\n  ──────', () => {
 						aaaa: ' 5555',
 					},
 					SectionB: {
+						list: ['aaa', 'bbb', 'ccc'],
 						key: 'value',
 						boolTrue: true,
 						boolFalse: false,
