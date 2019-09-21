@@ -3,7 +3,7 @@
 
 SHMAML
 ======
-Parse `.ini` files into JSON objects.
+Parse `.ini` files into JSON objects. Support lists.
 
 ## Install
 ```sh
@@ -21,7 +21,7 @@ const result = parse.sync('../path/to/config.ini');
 
 &nbsp;
 
-Example `config.ini`:
+Example `config.ini` + list:
 ```ini
 username = me
 pasword = 1234
@@ -31,6 +31,11 @@ pasword = 1234
 
 [SectionB]
   key=value
+  list=[
+      item1,
+      item2,
+      item3
+  ]
 ```
 Becomes:
 ```js
@@ -42,11 +47,17 @@ result = {
   },
   SectionB: {
     key: 'value',
+    list: ['item1', 'item2', 'item3']
   },
 }
 ```
 
 ## Convention
+* key-value pairs are noted with an equal sign.
+    ```ini
+    key="value"
+    ```
+
 * Quoting values is optional. Strings are used as default.  
     ```ini
     ; These are all the same:
@@ -70,15 +81,44 @@ result = {
     string = "false"
     ```
 
+* Sections are noted with wrapping square brackets.
+    ```ini
+    [categoryA]
+        key="value"
+    [categoryB]
+        key="value"
+    ```
+
+* Lists are also noted with wrapping square brackets when come after a `key=`.
+    ```ini
+    [categoryA]
+        key="value"
+        list=[item1, item2, item3]
+    ```
+
+* Multiline lists are also supported.
+    ```ini
+    [categoryA]
+        multilineList=[
+            item1,
+            item2,
+            item3
+        ]
+        key="value"
+    ```
+> NOTE: Nested lists are NOT supported.  
+> `list=[A, [B, [C, D]], E]`
+
 * Comments are ignored, obviously. Use quotes to work with semicolons:
     ```ini
     ; line comment
-    key1=value1 ; inline comment
-    key2='quoted ; semicolon'
-    key3="double quoted ; semicolon"
+    [category]
+        key1=value1 ; inline comment
+        key2='quoted ; semicolon'
+        key3="double quoted ; semicolon"
     ```
 
-* Whitespace is trimmed:
+* Whitespace (including tabs) is trimmed:
     ```ini
     ;Same
     [sectionA]
@@ -86,9 +126,9 @@ result = {
     ```
     ```ini
     ;Same
-    key = value
-    key =value
     key= value
+    key =value
+    key  =  value
     ```
     ```ini
     [sectionA]
@@ -99,7 +139,7 @@ result = {
     [sectionA]
         key=value   
     ```
-    Preserve whitespace using quotes:
+* Preserve whitespace using quotes:
     ```ini
     [' section   ']
     key="  value "
@@ -139,32 +179,3 @@ result = {
         sameKey: 'value3'
     }
     ```
-
-
-&nbsp;
-&nbsp;
-
-## Extras
-
-### Flags
-* Lines with no equal sign are treated as flags and will be parsed into an array named `"flags"` on the current section:
-    ```ini
-    'flagA'
-    "flagB"
-    key=value
-
-    [section]
-        "sectionFlag"
-        key=value
-    ```
-    ```js
-    result = {
-        flags: ['flagA', 'flagB'],
-        key: 'value',
-        section: {
-            flags: ['sectionFlag'],
-            key: 'value',
-        }
-    }
-    ```
-    >Note: Duplicated flag names are ignored.
