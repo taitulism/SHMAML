@@ -1,9 +1,10 @@
-/* eslint-disable max-statements */
+/* eslint-disable max-statements, max-lines-per-function */
 
 const {
 	isCommentedOut,
 	isSection,
 	normalizeValue,
+	normalizeListItem,
 	getSectionName,
 	isQuoted,
 	extractFromWrapper,
@@ -35,25 +36,42 @@ function getLineHandler (rootObj) {
 
 		const firstEqual = line.indexOf('=');
 
-		if (firstEqual === NONE) return;
+		if (firstEqual > 0) { // key= value/list
+			const [key, rawValue] = getKeyValue(line, firstEqual);
 
-		const [key, rawValue] = getKeyValue(line, firstEqual);
+			if (rawValue.startsWith('[')) { // List
+				// single line list
+				if (rawValue.endsWith(']')) {
+					const value = extractFromWrapper(rawValue); // .trim()
+					const listItems = normalizeListItem(value)
+					// const listItems = value.split(',').map(normalizeValue);
 
-		// List
-		if (rawValue.startsWith('[')) {
-			if (rawValue.endsWith(']')) { // single line list
-				const value = extractFromWrapper(rawValue);
-				const listItems = value.split(/,\s?/u).map(normalizeValue);
+					currentObj[key] = listItems;
+				}
+				// multiline list
+				else {
+					currentObj[key] = currentList = [];
+					const items = normalizeListItem(rawValue);
 
-				currentObj[key] = listItems;
+					items.forEach((item) => {
+						item && currentList.push(item);
+					});
+				}
+
 			}
-			else { // multiline list
-
+			else { // key=value
+				currentObj[key] = normalizeValue(rawValue);
 			}
 		}
-		// key=value
-		else {
-			currentObj[key] = normalizeValue(rawValue);
+		// multiline item, with or without the closing bracket ]
+		else if (currentList) {
+			if (line === ']') {
+				currentList = null;
+			}
+			else {
+				// continue multiline list or an error
+				currentList.push(...normalizeListItem(line));
+			}
 		}
 	};
 }

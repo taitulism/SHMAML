@@ -56,7 +56,7 @@ function isCommentedOut (line) {
 }
 
 function normalizeValue (value) {
-	value = removeInlineComments(value);
+	value = removeInlineComments(value).trim();
 
 	if (isQuoted(value)) {
 		return extractFromWrapper(value);
@@ -71,6 +71,31 @@ function normalizeValue (value) {
 	}
 
 	return value;
+}
+
+const LIST_SIGNS = [',', ']'];
+function normalizeListItem (item) {
+	item = removeInlineComments(item);
+
+	let itemLen = item.length;
+	const firstChar = item[0];
+	const lastChar = item[itemLen - 1];
+
+	if (firstChar === '[') {
+		item = item.substr(1).trimLeft();
+		itemLen = item.length;
+	}
+
+	if (LIST_SIGNS.includes(lastChar)) {
+		item = item.substr(0, itemLen - 1);
+	}
+
+	let items = isQuoted(item) ? [item] : item.split(',');
+	items = items
+		.map(mapItem => normalizeValue(mapItem.trim()))
+		.filter(filterItem => Boolean(filterItem))
+
+	return items;
 }
 
 const NONE = -1;
@@ -100,6 +125,7 @@ module.exports = {
 	isSection,
 	getSectionName,
 	normalizeValue,
+	normalizeListItem,
 	isCommentedOut,
 	isQuoted,
 	extractFromWrapper,

@@ -97,8 +97,8 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
-			describe('{ list: [item, item, item] }', () => {
-				it('[section]', async () => {
+			describe('{ list: [] }', () => {
+				it('inline list [item1, item2, item3]', async () => {
 					const returnedValue = await parse('./tests/ini-files/list.ini');
 
 					expect(returnedValue).to.deep.equal({
@@ -111,6 +111,26 @@ describe('SHMAML\n  ──────', () => {
 							names: ['Superman', 'Batman', 'Spiderman'],
 							key: 'value'
 						},
+					});
+				});
+
+				it('multiline list', async () => {
+					const returnedValue = parseSync('./tests/ini-files/list2.ini');
+
+					expect(returnedValue).to.deep.equal({
+						colors: [ 'blue', 'yellow' ],
+						key: 'value',
+						super_heros: {
+							names: ['Superman', 'Batman', 'Spiderman'],
+							key: 'value'
+						},
+						fruits: [
+							'apple',
+							'banana',
+							'orange',
+							'mango',
+							'water, melon'
+						]
 					});
 				});
 			});
@@ -224,8 +244,8 @@ describe('SHMAML\n  ──────', () => {
 				});
 			});
 
-			describe('{ list: [item, item, item] }', () => {
-				it('[section]', async () => {
+			describe('{ list: [] }', () => {
+				it('inline list [item1, item2, item3]', () => {
 					const returnedValue = parseSync('./tests/ini-files/list.ini');
 
 					expect(returnedValue).to.deep.equal({
@@ -238,6 +258,26 @@ describe('SHMAML\n  ──────', () => {
 							names: ['Superman', 'Batman', 'Spiderman'],
 							key: 'value'
 						},
+					});
+				});
+
+				it('multiline list', async () => {
+					const returnedValue = parseSync('./tests/ini-files/list2.ini');
+
+					expect(returnedValue).to.deep.equal({
+						colors: [ 'blue', 'yellow' ],
+						key: 'value',
+						super_heros: {
+							names: ['Superman', 'Batman', 'Spiderman'],
+							key: 'value'
+						},
+						fruits: [
+							'apple',
+							'banana',
+							'orange',
+							'mango',
+							'water, melon'
+						]
 					});
 				});
 			});
