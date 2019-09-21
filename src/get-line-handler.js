@@ -1,16 +1,13 @@
 /* eslint-disable max-statements, max-lines-per-function, no-multi-assign */
 
 const {
-	isCommentedOut,
+	cleanLine,
 	isSection,
+	getKeyValue,
 	normalizeValue,
 	normalizeListItem,
 	getSectionName,
 	extractFromWrapper,
-	// isQuoted,
-	// isBooleanStr,
-	// getBoolean,
-	// removeInlineComments,
 } = require('./utilities');
 
 function getLineHandler (rootObj) {
@@ -18,9 +15,9 @@ function getLineHandler (rootObj) {
 	let currentList = null;
 
 	return (line) => {
-		line = line.trim();
+		line = cleanLine(line);
 
-		if (!line || isCommentedOut(line)) return;
+		if (!line) return;
 
 		// [section]
 		if (isSection(line)) {
@@ -55,7 +52,6 @@ function getLineHandler (rootObj) {
 						item && currentList.push(item);
 					});
 				}
-
 			}
 			else { // key=value
 				currentObj[key] = normalizeValue(rawValue);
@@ -75,11 +71,3 @@ function getLineHandler (rootObj) {
 }
 
 module.exports = getLineHandler;
-
-function getKeyValue (line, firstEqual) {
-	// split once by equal
-	const key = line.substr(0, firstEqual).trim();
-	const value = line.substr(firstEqual + 1).trim();
-
-	return [key, value];
-}

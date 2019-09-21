@@ -1,12 +1,11 @@
+/* eslint-disable max-statements */
+
 function isSection (line) {
-	line = removeInlineComments(line);
     // e.g. [section]
 	return isWrappedWith('[', line, ']');
 }
 
 function getSectionName (line) {
-	line = removeInlineComments(line);
-
 	// extract "text" out of "[text]"
 	const text = extractFromWrapper(line).trim();
 
@@ -44,6 +43,7 @@ function isBooleanStr (str) {
 
 	return BOOLEANS.includes(str);
 }
+
 function getBoolean (str) {
 	str = str.toLowerCase();
 
@@ -56,8 +56,6 @@ function isCommentedOut (line) {
 }
 
 function normalizeValue (value) {
-	value = removeInlineComments(value).trim();
-
 	if (isQuoted(value)) {
 		return extractFromWrapper(value);
 	}
@@ -75,8 +73,6 @@ function normalizeValue (value) {
 
 const LIST_SIGNS = [',', ']'];
 function normalizeListItem (item) {
-	item = removeInlineComments(item);
-
 	let itemLen = item.length;
 	const firstChar = item[0];
 	const lastChar = item[itemLen - 1];
@@ -98,38 +94,53 @@ function normalizeListItem (item) {
 	return items;
 }
 
-const NONE = -1;
-const QUOTES = ['"', "'"];
-const isQuoteMark = aChar => QUOTES.includes(aChar);
+function getKeyValue (line, firstEqual) {
+	// split once by equal
+	const key = line.substr(0, firstEqual).trimRight();
+	const value = line.substr(firstEqual + 1).trimLeft();
 
-function removeInlineComments (str) {
-	const lastSemiColon = str.lastIndexOf(';');
+	return [key, value];
+}
 
-	if (lastSemiColon === NONE) return str;
+function cleanLine (line) {
+	line = line.trimLeft();
 
-	const withoutLastSemicolon = str.substr(0, lastSemiColon).trimRight();
-	const firstChar = withoutLastSemicolon[0];
-	const lastChar = withoutLastSemicolon[withoutLastSemicolon.length - 1];
+	if (!line || line[0] === ';') return null;
 
-	if (isQuoteMark(firstChar)) {
-		if (firstChar === lastChar) {
-			return withoutLastSemicolon;
+	const len = line.length;
+	let singleOpen = false;
+	let doubleOpen = false;
+	let semicolIndex = null;
+
+	for (let i = 0; i < len; i++) {
+		const char = line[i];
+
+		if (char === "'") {
+			singleOpen = !singleOpen;
+			if (!singleOpen) semicolIndex = null;
 		}
-		return str;
+
+		if (char === '"') {
+			doubleOpen = !doubleOpen;
+			if (!doubleOpen) semicolIndex = null;
+		}
+
+		if (char === ';') semicolIndex = semicolIndex || i;
 	}
 
-	return withoutLastSemicolon;
+	if (semicolIndex) {
+		line = line.substr(0, semicolIndex);
+	}
+
+	return line.trimRight();
 }
 
 module.exports = {
+	cleanLine,
 	isSection,
 	getSectionName,
+	getKeyValue,
 	normalizeValue,
 	normalizeListItem,
-	isCommentedOut,
-	isQuoted,
 	extractFromWrapper,
-	isBooleanStr,
-	getBoolean,
-	removeInlineComments,
 };
