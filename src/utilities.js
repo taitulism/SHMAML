@@ -93,7 +93,7 @@ function normalizeListItem (item) {
 	let items = isQuoted(item) ? [item] : item.split(',');
 	items = items
 		.map(mapItem => normalizeValue(mapItem.trim()))
-		.filter(filterItem => Boolean(filterItem))
+		.filter(filterItem => Boolean(filterItem));
 
 	return items;
 }

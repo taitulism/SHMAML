@@ -1,4 +1,4 @@
-/* eslint-disable max-statements, max-lines-per-function */
+/* eslint-disable max-statements, max-lines-per-function, no-multi-assign */
 
 const {
 	isCommentedOut,
@@ -6,14 +6,12 @@ const {
 	normalizeValue,
 	normalizeListItem,
 	getSectionName,
-	isQuoted,
 	extractFromWrapper,
-	isBooleanStr,
-	getBoolean,
-	removeInlineComments,
+	// isQuoted,
+	// isBooleanStr,
+	// getBoolean,
+	// removeInlineComments,
 } = require('./utilities');
-
-const NONE = -1;
 
 function getLineHandler (rootObj) {
 	let currentObj = rootObj;
@@ -43,7 +41,7 @@ function getLineHandler (rootObj) {
 				// single line list
 				if (rawValue.endsWith(']')) {
 					const value = extractFromWrapper(rawValue); // .trim()
-					const listItems = normalizeListItem(value)
+					const listItems = normalizeListItem(value);
 					// const listItems = value.split(',').map(normalizeValue);
 
 					currentObj[key] = listItems;
