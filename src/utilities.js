@@ -51,10 +51,6 @@ function getBoolean (str) {
 	if (str === BOOLEANS[1]) return false;
 }
 
-function isCommentedOut (line) {
-	return line[0] === ';';
-}
-
 function normalizeValue (value) {
 	if (isQuoted(value)) {
 		return extractFromWrapper(value);
