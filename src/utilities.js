@@ -1,8 +1,68 @@
-/* eslint-disable max-statements */
+/* eslint-disable
+	max-statements,
+	max-lines-per-function,
+	no-continue
+*/
 
-function isSection (line) {
-    // e.g. [section]
-	return isWrappedWith('[', line, ']');
+const SINGLE_QUOTE = "'";
+const DOUBLE_QUOTE = '"';
+const COMMA = ',';
+const SEMICOLON = ';';
+const BOOLEANS = ['true', 'false'];
+const OPEN_BRCKT = '[';
+const CLOSE_BRCKT = ']';
+
+function filter (line) {
+	line = line.trim();
+
+	if (!line || line[0] === SEMICOLON) return null;
+
+	return line;
+}
+
+function cleanLine (line) {
+	line = filter(line);
+
+	if (!line) return null;
+
+	const len = line.length;
+	let singleOpen = false;
+	let doubleOpen = false;
+	let semicolIndex = null;
+
+	for (let i = 0; i < len; i++) {
+		const char = line[i];
+
+		if (semicolIndex) break;
+
+		switch (char) {
+			case SINGLE_QUOTE:
+				singleOpen = !singleOpen;
+				if (!singleOpen) semicolIndex = null;
+				break;
+
+			case DOUBLE_QUOTE:
+				doubleOpen = !doubleOpen;
+				if (!doubleOpen) semicolIndex = null;
+				break;
+
+			case SEMICOLON:
+				if (!singleOpen && !doubleOpen) {
+					semicolIndex = semicolIndex || i;
+				}
+
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	if (semicolIndex) {
+		line = line.substr(0, semicolIndex);
+	}
+
+	return line.trimRight();
 }
 
 function getSectionName (line) {
@@ -20,8 +80,12 @@ function isWrappedWith (head, str, tail) {
 	return str.startsWith(head) && str.endsWith(tail || head);
 }
 
+function isWrappedWithBrackets (str) {
+	return isWrappedWith(OPEN_BRCKT, str, CLOSE_BRCKT);
+}
+
 function isQuoted (str) {
-	return isWrappedWith("'", str) || isWrappedWith('"', str);
+	return isWrappedWith(SINGLE_QUOTE, str) || isWrappedWith(DOUBLE_QUOTE, str);
 }
 
 function extractFromWrapper (str, wrapper) {
@@ -35,8 +99,6 @@ function isNumbersOnly (str) {
 
 	return String(num) === str;
 }
-
-const BOOLEANS = ['true', 'false'];
 
 function isBooleanStr (str) {
 	str = str.toLowerCase();
@@ -67,27 +129,71 @@ function normalizeValue (value) {
 	return value;
 }
 
-const LIST_SIGNS = [',', ']'];
-function normalizeListItem (item) {
-	let itemLen = item.length;
-	const firstChar = item[0];
-	const lastChar = item[itemLen - 1];
+function isList (value) {
+	return value.startsWith(OPEN_BRCKT);
+}
 
-	if (firstChar === '[') {
-		item = item.substr(1).trimLeft();
-		itemLen = item.length;
+function onlyStartsWithQuote (str) {
+	str = str.trim();
+
+	if (str.length === 1) return str === DOUBLE_QUOTE || str === SINGLE_QUOTE;
+
+	const onlyOneSingle = str.startsWith(SINGLE_QUOTE) && !str.endsWith(SINGLE_QUOTE);
+	const onlyOneDouble = str.startsWith(DOUBLE_QUOTE) && !str.endsWith(DOUBLE_QUOTE);
+	return onlyOneSingle || onlyOneDouble;
+}
+
+function onlyEndsWithQuote (str) {
+	str = str.trim();
+
+	if (str.length === 1) return str === DOUBLE_QUOTE || str === SINGLE_QUOTE;
+
+	const onlyOneSingle = !str.startsWith(SINGLE_QUOTE) && str.endsWith(SINGLE_QUOTE);
+	const onlyOneDouble = !str.startsWith(DOUBLE_QUOTE) && str.endsWith(DOUBLE_QUOTE);
+	return onlyOneSingle || onlyOneDouble;
+}
+
+function parseToList (listLine, isListStart) {
+	if (isListStart) {
+		listLine = listLine.substr(1).trimLeft();
+		if (!listLine) return [];
 	}
 
-	if (LIST_SIGNS.includes(lastChar)) {
-		item = item.substr(0, itemLen - 1);
+	if (listLine.endsWith(CLOSE_BRCKT) || listLine.endsWith(COMMA)) {
+		listLine = listLine.substr(0, listLine.length - 1).trimRight();
+		if (!listLine) return null;
 	}
 
-	let items = isQuoted(item) ? [item] : item.split(',');
-	items = items
-		.map(mapItem => normalizeValue(mapItem.trim()))
-		.filter(filterItem => Boolean(filterItem));
+	const items = listLine.split(COMMA);
+	const itemsLen = items.length;
 
-	return items;
+	const list = [];
+	let currentItem = '';
+
+	for (let i = 0; i < itemsLen; i++) {
+		let item = items[i];
+
+		if (!item) continue;
+
+		if (currentItem) {
+			currentItem += COMMA + item;
+
+			if (onlyEndsWithQuote(item)) {
+				currentItem = normalizeValue(currentItem.trim());
+				list.push(currentItem);
+				currentItem = null;
+			}
+		}
+		else if (onlyStartsWithQuote(item)) {
+			currentItem = item;
+		}
+		else {
+			item = normalizeValue(item.trim());
+			list.push(item);
+		}
+	}
+
+	return list;
 }
 
 function getKeyValue (line, firstEqual) {
@@ -98,45 +204,12 @@ function getKeyValue (line, firstEqual) {
 	return [key, value];
 }
 
-function cleanLine (line) {
-	line = line.trimLeft();
-
-	if (!line || line[0] === ';') return null;
-
-	const len = line.length;
-	let singleOpen = false;
-	let doubleOpen = false;
-	let semicolIndex = null;
-
-	for (let i = 0; i < len; i++) {
-		const char = line[i];
-
-		if (char === "'") {
-			singleOpen = !singleOpen;
-			if (!singleOpen) semicolIndex = null;
-		}
-
-		if (char === '"') {
-			doubleOpen = !doubleOpen;
-			if (!doubleOpen) semicolIndex = null;
-		}
-
-		if (char === ';') semicolIndex = semicolIndex || i;
-	}
-
-	if (semicolIndex) {
-		line = line.substr(0, semicolIndex);
-	}
-
-	return line.trimRight();
-}
-
 module.exports = {
 	cleanLine,
-	isSection,
+	isWrappedWithBrackets,
 	getSectionName,
 	getKeyValue,
 	normalizeValue,
-	normalizeListItem,
-	extractFromWrapper,
+	parseToList,
+	isList,
 };

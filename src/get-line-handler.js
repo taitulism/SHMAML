@@ -1,13 +1,13 @@
-/* eslint-disable max-statements, max-lines-per-function, no-multi-assign */
+/* eslint-disable no-multi-assign */
 
 const {
 	cleanLine,
-	isSection,
+	isWrappedWithBrackets,
 	getKeyValue,
 	normalizeValue,
-	normalizeListItem,
 	getSectionName,
-	extractFromWrapper,
+	parseToList,
+	isList,
 } = require('./utilities');
 
 function getLineHandler (rootObj) {
@@ -20,52 +20,33 @@ function getLineHandler (rootObj) {
 		if (!line) return;
 
 		// [section]
-		if (isSection(line)) {
+		if (isWrappedWithBrackets(line)) {
 			const sectionName = getSectionName(line);
-
-			rootObj[sectionName] = rootObj[sectionName] || {};
-			currentObj = rootObj[sectionName];
-
+			currentObj = rootObj[sectionName] = {};
 			return;
 		}
 
 		const firstEqual = line.indexOf('=');
 
-		if (firstEqual > 0) { // key= value/list
+		// key= value/list
+		if (firstEqual > 0) {
 			const [key, rawValue] = getKeyValue(line, firstEqual);
 
-			if (rawValue.startsWith('[')) { // List
-				// single line list
-				if (rawValue.endsWith(']')) {
-					const value = extractFromWrapper(rawValue); // .trim()
-					const listItems = normalizeListItem(value);
-					// const listItems = value.split(',').map(normalizeValue);
-
-					currentObj[key] = listItems;
-				}
-				// multiline list
-				else {
-					currentObj[key] = currentList = [];
-					const items = normalizeListItem(rawValue);
-
-					items.forEach((item) => {
-						item && currentList.push(item);
-					});
-				}
+			if (isList(rawValue)) {
+				currentObj[key] = parseToList(rawValue, true);
+				currentList = rawValue.endsWith(']') ? null : currentObj[key];
 			}
 			else { // key=value
 				currentObj[key] = normalizeValue(rawValue);
 			}
 		}
-		// multiline item, with or without the closing bracket ]
+		// multiline list item, with or without closing bracket ]
 		else if (currentList) {
-			if (line === ']') {
-				currentList = null;
-			}
-			else {
-				// continue multiline list or an error
-				currentList.push(...normalizeListItem(line));
-			}
+			// List End
+			if (line === ']') currentList = null;
+
+			// List Continues (multiline)
+			else currentList.push(...parseToList(line, false));
 		}
 	};
 }

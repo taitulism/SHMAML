@@ -60,7 +60,7 @@ describe('SHMAML\n  ──────', () => {
 		});
 	});
 
-	describe('Standard `config.ini` with lists', () => {
+	describe('* Standard `config.ini` with lists', () => {
 		it('parses standard `config.ini` files', async () => {
 			const configFile = './tests/dummy-config-files/standard.ini';
 
@@ -95,7 +95,7 @@ describe('SHMAML\n  ──────', () => {
 		});
 	});
 
-	describe('* Conventions', () => {
+	describe('* Conventions:', () => {
 		describe('key=value', () => {
 			it('key=value', async () => {
 				const configFile = './tests/dummy-config-files/key-value-pairs.ini';
@@ -228,8 +228,8 @@ describe('SHMAML\n  ──────', () => {
 		});
 
 		describe('Lists', () => {
-			it('inline list', async () => {
-				const configFile = './tests/dummy-config-files/inline-list.ini';
+			it('single line list', async () => {
+				const configFile = './tests/dummy-config-files/single-line-list.ini';
 
 				const result = await parse(configFile);
 				const resultSync = parseSync(configFile);
@@ -242,10 +242,16 @@ describe('SHMAML\n  ──────', () => {
 						'red'
 					],
 					key: 'value',
-					category: {
+					categoryA: {
 						fruits: ['apple', 'banana', 'orange'],
 						vegetables: ['potato', 'carrot', 'onion'],
 						key: 'value'
+					},
+					categoryB: {
+						specialCaseA: ['do', 'don\'t', 'do'],
+						specialCaseB: ['do this', 'then, this', 'and that ,', 'don\'t'],
+						// specialCaseC: ['do this', 'then, this', 'and that, ', 'don\'t'],
+						// specialCaseD: ['do this', 'then; this', 'and that,', 'don\'t']
 					},
 				});
 			});

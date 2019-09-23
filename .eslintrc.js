@@ -79,7 +79,10 @@ module.exports = {
 		"id-length": ["error", {"exceptions": ["i"]}],
 		"id-match": "error",
 		"implicit-arrow-linebreak": "error",
-		"indent": ["error", "tab", {"ignoreComments": true}],
+		"indent": ["error", "tab", {
+			"ignoreComments": true,
+			"SwitchCase": 1
+		}],
 //		"indent-legacy": "off",
 //		"init-declarations": "off",
 		"jsx-quotes": "error",
