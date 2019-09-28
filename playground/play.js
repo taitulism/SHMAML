@@ -13,7 +13,7 @@ const parse = require('../index');
 		// console.log(obj.colors3);
 		// console.log(obj.colors4);
 
-		setTimeout(() => { }, 15000);
+		setTimeout(() => { }, 20000);
 	}
 	catch (err) {
 		console.log('ARRR:\n', err);

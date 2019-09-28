@@ -1,16 +1,18 @@
 /* eslint-disable
 	max-statements,
 	max-lines-per-function,
-	no-continue
+	no-continue,
+	id-length,
 */
 
 const SINGLE_QUOTE = "'";
 const DOUBLE_QUOTE = '"';
 const COMMA = ',';
 const SEMICOLON = ';';
-const BOOLEANS = ['true', 'false'];
 const OPEN_BRCKT = '[';
 const CLOSE_BRCKT = ']';
+const BOOLEANS = ['true', 'false'];
+const SECTION = 0;
 
 function filter (line) {
 	line = line.trim();
@@ -18,6 +20,35 @@ function filter (line) {
 	if (!line || line[0] === SEMICOLON) return null;
 
 	return line;
+}
+
+const EVEN = 2;
+
+function isEven (num) {
+	return num % EVEN === 0;
+}
+
+function parse (line) {
+	if (line[0] === OPEN_BRCKT) {
+		return parseSection(line);
+	}
+
+	const obj = {type: null};
+	const len = line.length;
+
+	let isQuoting = false;
+	let quote = null;
+	let singles = 0;
+	let doubles = 0;
+	let brackets = 0;
+	let semicolon = null;
+
+	for (let i = 0; i < len; i++) {
+		const char = line[i];
+
+	}
+
+	return obj;
 }
 
 function cleanLine (line) {
@@ -65,8 +96,83 @@ function cleanLine (line) {
 	return line.trimRight();
 }
 
+function parseSection (line) {
+	const len = line.length;
+
+	if (line[len - 1] === CLOSE_BRCKT) {
+		return {
+			type: SECTION,
+			name: getSectionName(line),
+		};
+	}
+
+	let isQuoting = false;
+	let quote = null;
+	let singles = 0;
+	let doubles = 0;
+	let closingBracket = 0;
+	let semicolon = 0;
+
+	for (let i = 0; i < len; i++) {
+		const char = line[i];
+
+		switch (char) {
+			case SINGLE_QUOTE:
+				if (isQuoting && quote === SINGLE_QUOTE) {
+					singles--;
+				}
+				else if (!isQuoting) {
+					singles++;
+					// isQuoting = true;
+					quote = SINGLE_QUOTE;
+				}
+
+				break;
+
+			case DOUBLE_QUOTE:
+				if (isQuoting && quote === DOUBLE_QUOTE) {
+					doubles--;
+				}
+				else if (!isQuoting) {
+					doubles++;
+					// isQuoting = true;
+					quote = DOUBLE_QUOTE;
+				}
+				break;
+
+			case SEMICOLON:
+				if (closingBracket && !semicolon) {
+					semicolon = i;
+				}
+				break;
+
+			case CLOSE_BRCKT:
+				if (!closingBracket) {
+					closingBracket = i;
+				}
+				break;
+
+			default:
+				break;
+		}
+
+		isQuoting = Boolean(singles || doubles);
+	}
+
+	if (semicolon > closingBracket) {
+		line = line.substr(0, semicolon).trimRight();
+	}
+
+	console.log(`*${getSectionName(line)}*`);
+
+	return {
+		type: SECTION,
+		name: getSectionName(line),
+	};
+	// return line.trimRight();
+}
+
 function getSectionName (line) {
-	// extract "text" out of "[text]"
 	const text = extractFromWrapper(line).trim();
 
 	if (isQuoted(text)) {
@@ -74,6 +180,10 @@ function getSectionName (line) {
 		return extractFromWrapper(text);
 	}
 	return text;
+}
+
+function countOccurrences (target, str) {
+
 }
 
 function isWrappedWith (head, str, tail) {
@@ -206,6 +316,7 @@ function getKeyValue (line, firstEqual) {
 
 module.exports = {
 	cleanLine,
+	parse,
 	isWrappedWithBrackets,
 	getSectionName,
 	getKeyValue,

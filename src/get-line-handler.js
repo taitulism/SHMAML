@@ -2,6 +2,7 @@
 
 const {
 	cleanLine,
+	parse,
 	isWrappedWithBrackets,
 	getKeyValue,
 	normalizeValue,
@@ -9,6 +10,8 @@ const {
 	parseToList,
 	isList,
 } = require('./utilities');
+
+const SECTION = 0;
 
 function getLineHandler (rootObj) {
 	let currentObj = rootObj;
@@ -19,10 +22,10 @@ function getLineHandler (rootObj) {
 
 		if (!line) return;
 
-		// [section]
-		if (isWrappedWithBrackets(line)) {
-			const sectionName = getSectionName(line);
-			currentObj = rootObj[sectionName] = {};
+		const lineObj = parse(line);
+
+		if (lineObj.type === SECTION) {
+			currentObj = rootObj[lineObj.name] = {};
 			return;
 		}
 
