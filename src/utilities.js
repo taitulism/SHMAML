@@ -3,6 +3,7 @@
 	max-lines-per-function,
 	no-continue,
 	id-length,
+	no-loop-func,
 */
 
 const SINGLE_QUOTE = "'";
@@ -108,34 +109,31 @@ function parseSection (line) {
 
 	let isQuoting = false;
 	let quote = null;
+	let single = false;
+	let double = false;
 	let singles = 0;
 	let doubles = 0;
 	let closingBracket = 0;
 	let semicolon = 0;
+	let sectionName = '';
 
-	for (let i = 0; i < len; i++) {
+	for (let i = 1; i < len; i++) {
 		const char = line[i];
 
 		switch (char) {
 			case SINGLE_QUOTE:
-				if (isQuoting && quote === SINGLE_QUOTE) {
-					singles--;
-				}
-				else if (!isQuoting) {
-					singles++;
-					// isQuoting = true;
+				singles++;
+				single = !single;
+				if (single) {
 					quote = SINGLE_QUOTE;
 				}
 
 				break;
 
 			case DOUBLE_QUOTE:
-				if (isQuoting && quote === DOUBLE_QUOTE) {
-					doubles--;
-				}
-				else if (!isQuoting) {
-					doubles++;
-					// isQuoting = true;
+				doubles++;
+				double = !double;
+				if (double) {
 					quote = DOUBLE_QUOTE;
 				}
 				break;
@@ -153,37 +151,49 @@ function parseSection (line) {
 				break;
 
 			default:
+				sectionName += char;
 				break;
 		}
 
-		isQuoting = Boolean(singles || doubles);
+		isQuoting = Boolean(single || double);
 	}
 
 	if (semicolon > closingBracket) {
 		line = line.substr(0, semicolon).trimRight();
 	}
 
-	console.log(`*${getSectionName(line)}*`);
-
 	return {
 		type: SECTION,
 		name: getSectionName(line),
 	};
-	// return line.trimRight();
 }
 
 function getSectionName (line) {
 	const text = extractFromWrapper(line).trim();
 
-	if (isQuoted(text)) {
+	if (isQuoted(text) && countOccurrences(text[0], text) === 2) {
 		// unquote
 		return extractFromWrapper(text);
 	}
 	return text;
 }
 
-function countOccurrences (target, str) {
+function countOccurrences (chars, text) {
+	let len = text.length;
+	let count = 0;
 
+	while (--len >= 0) {
+		if (Array.isArray(chars)) {
+			chars.forEach((char) => {
+				text[len] === char && count++;
+			});
+		}
+		else {
+			text[len] === chars && count++;
+		}
+	}
+
+	return count;
 }
 
 function isWrappedWith (head, str, tail) {
